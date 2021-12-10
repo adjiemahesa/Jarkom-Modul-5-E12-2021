@@ -250,6 +250,8 @@ Lalu, untuk DHCP Relay pada `Water7` dan `Guanhao` diisi seperti berikut
 
 ![image](https://user-images.githubusercontent.com/55140514/145562931-926ffd94-cebd-4c58-b88e-5a8fdbf2109c.png)
 
+<hr/>
+
 ## Soal 1
 Agar topologi yang kalian buat dapat mengakses keluar, kalian diminta untuk mengkonfigurasi Foosha menggunakan iptables, tetapi Luffy tidak ingin menggunakan MASQUERADE.
 
@@ -273,10 +275,14 @@ Kita mencoba ping `google.com` dari node lain. Disini kita menggunakan node `ELE
 * `-j SNAT` : Menggunakan SNAT untuk mengubah dari mana koneksi terjadi
 * `--to-source 192.168.122.89` : Asal koneksi terjadi. Disini kami menggunakan `Fixed Address` 192.168.122.89
 
+<hr/>
+
 ## Soal 2
 Kalian diminta untuk mendrop semua akses HTTP dari luar Topologi kalian pada server yang merupakan DHCP Server dan DNS Server demi menjaga keamanan.
 
 **Pembahasan**
+
+<hr/>
 
 ## Soal 3
 Karena kelompok kalian maksimal terdiri dari 3 orang. Luffy meminta kalian untuk membatasi DHCP dan DNS Server hanya boleh menerima maksimal 3 koneksi ICMP secara bersamaan menggunakan iptables, selebihnya didrop.
@@ -315,3 +321,51 @@ Bisa dilihat bahwa pada node `Fukurou` tidak bisa melakukan ping ke IP DHCP Serv
 * `--connlimit-above 3`: Mendefinisikan jika connlimit sudah diatas 3
 * `--connlimit-mask 0` : Mendefinisikan mask yang masuk. 0 berarti akan menerima semua mask
 * `-j DROP` : Melakukan DROP koneksi
+
+<hr/>
+
+## Soal 4 dan 5
+Kemudian kalian diminta untuk membatasi akses ke Doriki yang berasal dari subnet Blueno, Cipher, Elena dan Fukuro dengan beraturan sebagai berikut
+
+4. Akses dari subnet Blueno dan Cipher hanya diperbolehkan pada pukul 07.00 - 15.00 pada hari Senin sampai Kamis.
+5. Akses dari subnet Elena dan Fukuro hanya diperbolehkan pada pukul 15.01 hingga pukul 06.59 setiap harinya.
+
+**Pembahasan**
+1. Untuk membatas waktu akses kita menggunakan rule `time` yang bisa mendefinisikan range waktu dengan `--timestart` untuk mulai waktu dan `--timestop` untuk akhir waktu.
+2. Pada **Soal 4** kita juga menggunakan `--weekdays` untuk mendefinisikan harinya. Sedangkan untuk **Soal 5** kita tidak perlu melakukan itu karena yang diminta adalah setiap hari
+3. Konfigurasi perintah iptables sebagai berikut 
+* **Soal4**
+```
+#Blueno
+iptables -A INPUT -s 10.35.7.0/25 -m time --timestart 07:00 --timestop 15:00 --weekdays Mon,Tue,Wed,Thu -j ACCEPT
+iptables -A INPUT -s 10.35.7.0/25 -j REJECT
+
+#Cipher
+iptables -A INPUT -s 10.35.0.0/22 -m time --timestart 07:00 --timestop 15:00 --weekdays Mon,Tue,Wed,Thu -j ACCEPT
+iptables -A INPUT -s 10.35.0.0/22 -j REJECT
+```
+* **Soal 5**
+```
+#Elena
+iptables -A INPUT -s 10.35.4.0/23 -m time --timestart 00:00 --timestop 06:59 -j ACCEPT
+iptables -A INPUT -s 10.35.4.0/23 -m time --timestart 15:01 --timestop 23:59 -j ACCEPT
+iptables -A INPUT -s 10.35.4.0/23 -j REJECT
+
+#Fukurou
+iptables -A INPUT -s 10.35.6.0/24 -m time --timestart 00:00 --timestop 06:59 -j ACCEPT
+iptables -A INPUT -s 10.35.6.0/24 -m time --timestart 15:01 --timestop 23:59 -j ACCEPT
+iptables -A INPUT -s 10.35.6.0/23 -j REJECT
+```
+4. Untuk `Soal 4` source nya akan dirubah menjadi subnet `Blueno` dan `Cipher` dan dimasukkan hari `Mon,Tue,Wed,Thu` atau Senin sampai Kamis pada `--weekdays`. Lalu, dilakukan `REJECT` untuk secara umum agar hanya bisa diakses menggunakan peraturan yang telah kita buat.
+5. Untuk `Soal 5` sama seperti Soal 4 tetapi kita gunakan source untuk subnet `Elena` dan `Fukurou`, tidak digunakan `--weekdays` karena yang ditentukan adalah setiap hari, serta dibuat untuk 2 range waktu yaitu `00:00 - 06:59` dan `15:01 - 23:59` karena waktunya tidak bisa melebihi 23:59 serta agar sesuai dengan ketentuan yang diberikkan soal. 
+
+### Note
+* `-A INPUT` : Meng-*append* chain INPUT yang memfilter paket yang masuk
+* `-s [IP Subnet]` : Menunjukkan source dari paket yaitu subnet
+* `-m time` : Menyesuaikan dengan rule time
+* `--timestart` : Waktu mulai
+* `--timestop` : Waktu berhenti
+* `--weekdays` : Mendefinisikan hari-hari kerja
+* `-j ACCEPT / REJECT`: Menerima atau menolak koneksi
+
+
