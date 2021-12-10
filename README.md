@@ -249,3 +249,28 @@ Lalu, untuk DHCP Relay pada `Water7` dan `Guanhao` diisi seperti berikut
 * Guanhao
 
 ![image](https://user-images.githubusercontent.com/55140514/145562931-926ffd94-cebd-4c58-b88e-5a8fdbf2109c.png)
+
+## Soal 1
+Agar topologi yang kalian buat dapat mengakses keluar, kalian diminta untuk mengkonfigurasi Foosha menggunakan iptables, tetapi Luffy tidak ingin menggunakan MASQUERADE.
+
+**Pembahasan**
+1. Pada soal ini akan dilakukan iptables agar semua node dapat mengakses internet.
+2. Pada soal ini juga diminta agar konfigurasi iptables tidak menggunakan `MASQUERADE`. Maka yang digunakan adalah `SNAT` dari chain `POSTROUTING` yang ada di dalam *table* `NAT`
+3. Konfigurasi perintah iptables sebagai berikut 
+```
+iptables -t nat -A POSTROUTING -s 10.35.0.0/21 -o eth0 -j SNAT --to-source 192.168.122.89
+```
+### Testing
+Kita mencoba ping `google.com` dari node lain. Disini kita menggunakan node `ELENA`
+
+![image](https://user-images.githubusercontent.com/55140514/145565463-514f5fd6-2e47-41d2-be37-a82522acdad6.png)
+
+### Note
+* `-t nat` : Menggunakan Table NAT
+* `-A POSTROUTING` : Meng-*append* chain POSTROUTING yang mengubah asal paket setelah routing
+* `-s 10.35.0.0/21` : Menunjukkan source dari paket yaitu subnet 10.35.0.0/21
+* `-o eth0` : Mendefinisikan interface yang dilihta untuk paket keluarnya. Disini digunakan eth0 FOOSHA
+* `-j SNAT` : Menggunakan SNAT untuk mengubah dari mana koneksi terjadi
+* `--to-source 192.168.122.89` : Asal koneksi terjadi. Disini kami menggunakan `Fixed Address` 192.168.122.89
+
+
