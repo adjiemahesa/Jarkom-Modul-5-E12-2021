@@ -308,3 +308,10 @@ Dan Terakhir pada node `Fukurou`
 
 Bisa dilihat bahwa pada node `Fukurou` tidak bisa melakukan ping ke IP DHCP Server karena sudah ada 3 koneksi yang melakukan ping sebelumnya
 
+### Note
+* `-A INPUT` : Meng-*append* chain INPUT yang memfilter paket yang masuk
+* `-p icmp` : Mendefinisikan opsi port. Disini digunakan port `icmp`
+* `-m connlimit` : Menyesuaikan dengan rule connlimit
+* `--connlimit-above 3`: Mendefinisikan jika connlimit sudah diatas 3
+* `--connlimit-mask 0` : Mendefinisikan mask yang masuk. 0 berarti akan menerima semua mask
+* `-j DROP` : Melakukan DROP koneksi
