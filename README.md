@@ -359,6 +359,29 @@ iptables -A INPUT -s 10.35.6.0/23 -j REJECT
 4. Untuk `Soal 4` source nya akan dirubah menjadi subnet `Blueno` dan `Cipher` dan dimasukkan hari `Mon,Tue,Wed,Thu` atau Senin sampai Kamis pada `--weekdays`. Lalu, dilakukan `REJECT` untuk secara umum agar hanya bisa diakses menggunakan peraturan yang telah kita buat.
 5. Untuk `Soal 5` sama seperti Soal 4 tetapi kita gunakan source untuk subnet `Elena` dan `Fukurou`, tidak digunakan `--weekdays` karena yang ditentukan adalah setiap hari, serta dibuat untuk 2 range waktu yaitu `00:00 - 06:59` dan `15:01 - 23:59` karena waktunya tidak bisa melebihi 23:59 serta agar sesuai dengan ketentuan yang diberikkan soal. 
 
+### Testing
+Dilakukan ping ke `Doriki` pada dua waktu tertentu. Untuk **Soal 4** waktu yang digunakan adalah `Kamis, 09 Desember 2021 10:00:00` dan `Kamis, 09 Desember 2021 22:00:00`. Node yang digunakan adalah `Blueno` dan Hasil seperti berikut
+* Kamis, 09 Desember 2021 10:00:00
+
+![image](https://user-images.githubusercontent.com/55140514/145572518-d5d9f4c7-31d2-49f0-b65b-5f6160ef9cdb.png)
+
+* Kamis, 09 Desember 2021 22:00:00 
+
+![image](https://user-images.githubusercontent.com/55140514/145572572-15386a29-954e-4b63-8fdd-454c24c70679.png)
+
+
+Lalu, untuk **Soal 5** digunakan waktu yang sama tetapi pada node `Elena`. Perlu diperhatikan bahwa di soal ini waktu akses nya adalah pukul `15:01 hingga 06:59`
+
+* Kamis, 09 Desember 2021 22:00:00
+
+![image](https://user-images.githubusercontent.com/55140514/145573037-7c7857c3-9b67-4c9d-bea8-e479ec355b3e.png)
+
+* Kamis, 09 Desember 2021 10:00:00 
+
+![image](https://user-images.githubusercontent.com/55140514/145573064-0db3d0fe-7fb2-419d-9135-8e601e7f7a26.png)
+
+Bisa dilihat bahwa saat berada diluar waktu yang ditentukan node tidak bisa melakukan ping
+
 ### Note
 * `-A INPUT` : Meng-*append* chain INPUT yang memfilter paket yang masuk
 * `-s [IP Subnet]` : Menunjukkan source dari paket yaitu subnet
