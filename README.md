@@ -273,4 +273,38 @@ Kita mencoba ping `google.com` dari node lain. Disini kita menggunakan node `ELE
 * `-j SNAT` : Menggunakan SNAT untuk mengubah dari mana koneksi terjadi
 * `--to-source 192.168.122.89` : Asal koneksi terjadi. Disini kami menggunakan `Fixed Address` 192.168.122.89
 
+## Soal 2
+Kalian diminta untuk mendrop semua akses HTTP dari luar Topologi kalian pada server yang merupakan DHCP Server dan DNS Server demi menjaga keamanan.
+
+**Pembahasan**
+
+## Soal 3
+Karena kelompok kalian maksimal terdiri dari 3 orang. Luffy meminta kalian untuk membatasi DHCP dan DNS Server hanya boleh menerima maksimal 3 koneksi ICMP secara bersamaan menggunakan iptables, selebihnya didrop.
+
+**Pembahasan**
+1. Untuk melakukan pembatasan koneksi kita menggunakan aturan `connlimit`. Pada aturan tersebut kita mengatur berapa banyak koneksi yang bisa dijalankan dengan `--connlimit-above` dan yang menggunakan mask apa dengan `--connlimit-mask`
+2. Karena yang diminta membatasi baik DHCP dan DNS maka kita akan memasukkan perintah di node `Jipanggu` sebagai DHCP Server dan `Doriki` sebagai DNS Server
+3. Konfigurasi perintah iptables sebagai berikut 
+```
+iptables -A INPUT -p icmp -m connlimit --connlimit-above 3 --connlimit-mask 0 -j DROP
+```
+
+### Testing
+Dilakukan ping ke DNS Server dan DHCP Server dari 4 Node. Disini kita mencoba ping ke IP DHCP Server yaitu IP `Jipanggu`. Pertama pada node `Elena` seperti berikut
+
+![image](https://user-images.githubusercontent.com/55140514/145567662-3ac80558-3531-41aa-a9d7-e85a3e26dae8.png)
+
+Lalu kedua pada node `Blueno` seperti berikut
+
+![image](https://user-images.githubusercontent.com/55140514/145567689-39477cd9-f6e0-4f4d-a46d-b3feb3bf2252.png)
+
+Ketiga pada node `Cipher`
+
+![image](https://user-images.githubusercontent.com/55140514/145567735-64dfd849-cad9-4eb8-8070-1287347059c8.png)
+
+Dan Terakhir pada node `Fukurou`
+
+![image](https://user-images.githubusercontent.com/55140514/145567809-9ae1ba30-a579-451f-9dd7-987cb157f262.png)
+
+Bisa dilihat bahwa pada node `Fukurou` tidak bisa melakukan ping ke IP DHCP Server karena sudah ada 3 koneksi yang melakukan ping sebelumnya
 
