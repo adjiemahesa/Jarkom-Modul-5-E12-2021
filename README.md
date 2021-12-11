@@ -423,6 +423,32 @@ Bisa dilihat bahwa saat berada diluar waktu yang ditentukan node tidak bisa mela
 Karena kita memiliki 2 Web Server, Luffy ingin Guanhao disetting sehingga setiap request dari client yang mengakses DNS Server akan didistribusikan secara bergantian pada Jorge dan Maingate
 
 **Pembahasan**
-1. Pada soal ini kita diminta untuk melakukan *Load Balancing*. Maka pada iptables kita akan menggunakan 
-2. 
+1. Pada soal ini kita diminta untuk melakukan *Load Balancing*. Maka sesuai dengan soal kita akan melakukan setting iptables pada `Guanhao` menggunakan `PREROUTING` yang manipulasi paket sebelum masuk routing dan `POSTROUTING` untuk setelahnya. menggunakan rule `statistic` yang akan skip atau accept a rule berdasarkan kondisi statistic
+2. Lalu kita juga menggunakan `statistic` yang akan skip atau accept a rule berdasarkan kondisi. Pada rule ini kita menggunakan `--mode` untuk mendefinisikan metode yang ingin digunakan. Disini kita menggunakan `nth` dimana itu adalah nth metode `Roundrobin`. Untuk menjalankan load balancing roundrobin diperlukan penentuan paket dengan `--every .. --packet ..`.
+3. Konfigurasi perintah iptables sebagai berikut 
+```
+iptables -A PREROUTING -t nat -p tcp -d 10.35.7.131 --dport 80 -m statistic --mode nth --every 2 --packet 0 -j DNAT --to-destination 10.35.7.139:80
+iptables -A PREROUTING -t nat -p tcp -d 10.35.7.131 --dport 80 -j DNAT --to-destination 10.35.7.138:80
+
+iptables -t nat -A POSTROUTING -p tcp -d 10.35.7.139 --dport 80 -j SNAT --to-source 10.35.7.131
+iptables -t nat -A POSTROUTING -p tcp -d 10.35.7.138 --dport 80 -j SNAT --to-source 10.35.7.131
+```
+
+### Testing
+* Melakukan `curl` ke salah satu IP `DNS Server` yaitu IP `Doriki`. Hasil sebagai berikut
+
+![image](https://user-images.githubusercontent.com/55140514/145680092-7baa0faa-fea7-41e9-b6a2-2f13f540372d.png)
+
+Bisa dilihat bahwa setiap kali kita melakukan curl akan berubah-rubah dari ke `Jorge` atau `Maingate`
+
+### Note
+* Dilakukan instalasi `Apache Server` pada node `Jorge` dan `Maingate`. Lalu, diaktifkan web servernya dengan `a2ensite` serta mengubah isi pada `index.html` di `var/www` supaya lebih mudah mengetahui menyambung dengan webserver mana
+* `-t nat` : Menggunakan Table NAT
+* `-A POSTROUTING` : Meng-*append* chain POSTROUTING yang mengubah asal paket setelah routing
+* `-A PREROUTING` : Meng-*append* chain POSTROUTING yang manipulasi paket sebelum masuk routing
+* `-p tcp` : Mendefinisikan opsi protocol port. Disini digunakan port `tcp`
+* `--dport 80` : Port yang dilihat adalah port 80
+* `-m statistic` : Menyesuaikan dengan rule statistic
+* `--mode nth` : Menggunakan metode roundrobin
+* `--every 2 --packet 0` : Membagikan beban paket
 
