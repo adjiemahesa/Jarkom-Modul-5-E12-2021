@@ -281,6 +281,12 @@ Kita mencoba ping `google.com` dari node lain. Disini kita menggunakan node `ELE
 Kalian diminta untuk mendrop semua akses HTTP dari luar Topologi kalian pada server yang merupakan DHCP Server dan DNS Server demi menjaga keamanan.
 
 **Pembahasan**
+  
+Pada Foosha akan ditambakan rue sebagai berikut:  
+```
+iptables -A FORWARD -d 10.35.7.128 -i eth0 -p tcp --dport 80 -j DROP
+```  
+hal ini dimksudkan agar paket-paket yang menuju(dalam artian dari luar) ke port 80 (HTTP) dakan di-drop.  
 
 <hr/>
 
