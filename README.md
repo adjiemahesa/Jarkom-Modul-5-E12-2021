@@ -281,12 +281,26 @@ Kita mencoba ping `google.com` dari node lain. Disini kita menggunakan node `ELE
 Kalian diminta untuk mendrop semua akses HTTP dari luar Topologi kalian pada server yang merupakan DHCP Server dan DNS Server demi menjaga keamanan.
 
 **Pembahasan**
-  
-Pada Foosha akan ditambakan rue sebagai berikut:  
+1. Pada soal ini kita diminta untuk melakukan pembatasan akses dari luar topologi sehingga jika mengakses ke DNS dan DHCP Server akan di-*drop*. Disini kami menggunakan chain `FORWARD` yang melakukan filter pada paket yang akan diteruskan.
+2. Selanjutnya kita akan menggunakan `-d` dimana akan menjadi destinasi untuk filternya. Disini kami menggunakan subnet yang ada `DNS dan DHCP Server`.
+3. Pada soal ini untuk percobaan kami menambahkan `PC` yang menyambung dengan `Foosha` yang berperan sebagai PC dari luar topologi dikarenakan menggunakan IP dan Subnet Mask yang berbeda. Oleh karena itu rule akan diarahkan ke PC tersebut (Disini berada di `eth3` Foosha)
+4. Pada Foosha akan ditambakan rule sebagai berikut:  
 ```
-iptables -A FORWARD -d 10.35.7.128 -i eth0 -p tcp --dport 80 -j DROP
+iptables -A FORWARD -d 10.35.7.128/29 -i eth3 -p tcp --dport 80 -j DROP
 ```  
-hal ini dimksudkan agar paket-paket yang menuju(dalam artian dari luar) ke port 80 (HTTP) dakan di-drop.  
+Hal ini dimaksudkan agar paket-paket yang menuju(dalam artian dari luar) ke port 80 (HTTP) akan di-drop.
+
+### Testing
+* Dibuatkan PC dari luat bernama `testing`.
+
+![image](https://user-images.githubusercontent.com/55140514/145678947-4a1271e8-15c9-4fe4-a7bc-cd8402ce14e5.png)
+
+
+* Melakukan `nmap` dengan `-p` ke port `80` ke `IP DNS atau DHCP Server` menjadi `nmap -p 80 10.35.7.130` dan `nmap -p 80 10.35.7.131`. Hasil sebagai berikut
+
+![image](https://user-images.githubusercontent.com/55140514/145678892-0e97a0c7-160a-4207-aec8-14c183f93cee.png)
+
+* Bisa dilihat bahwa jika kita melakukan `nmap` akan terjadi tulisan `filtered`.
 
 <hr/>
 
@@ -397,4 +411,10 @@ Bisa dilihat bahwa saat berada diluar waktu yang ditentukan node tidak bisa mela
 * `--weekdays` : Mendefinisikan hari-hari kerja
 * `-j ACCEPT / REJECT`: Menerima atau menolak koneksi
 
+## Soal 6
+Karena kita memiliki 2 Web Server, Luffy ingin Guanhao disetting sehingga setiap request dari client yang mengakses DNS Server akan didistribusikan secara bergantian pada Jorge dan Maingate
+
+**Pembahasan**
+1. Pada soal ini kita diminta untuk melakukan *Load Balancing*. Maka pada iptables kita akan menggunakan 
+2. 
 
