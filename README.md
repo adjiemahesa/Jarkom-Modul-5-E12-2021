@@ -302,6 +302,14 @@ Hal ini dimaksudkan agar paket-paket yang menuju(dalam artian dari luar) ke port
 
 * Bisa dilihat bahwa jika kita melakukan `nmap` akan terjadi tulisan `filtered`.
 
+### Note
+* `-A FORWARD` : Meng-*append* chain POSTROUTING yang melakukan filter pada paket yang akan diteruskan
+* `-d 10.35.7.128/29` : Menunjukkan destinasi yaitu subnet 10.35.7.128/29
+* `-i eth3` : Mendefinisikan interface yang dilihat untuk paket yang masuk. Disini digunakan eth3 FOOSHA'
+* `-p tcp` : Mendefinisikan opsi protocol port. Disini digunakan port `tcp`
+* `--dport 80` : Port yang dilihat adalah port 80
+* `-j DROP` : Melakukan DROP koneksi
+
 <hr/>
 
 ## Soal 3
@@ -336,7 +344,7 @@ Bisa dilihat bahwa pada node `Fukurou` tidak bisa melakukan ping ke IP DHCP Serv
 
 ### Note
 * `-A INPUT` : Meng-*append* chain INPUT yang memfilter paket yang masuk
-* `-p icmp` : Mendefinisikan opsi port. Disini digunakan port `icmp`
+* `-p icmp` : Mendefinisikan opsi protocol port. Disini digunakan port `icmp`
 * `-m connlimit` : Menyesuaikan dengan rule connlimit
 * `--connlimit-above 3`: Mendefinisikan jika connlimit sudah diatas 3
 * `--connlimit-mask 0` : Mendefinisikan mask yang masuk. 0 berarti akan menerima semua mask
